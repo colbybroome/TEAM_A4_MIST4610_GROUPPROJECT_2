@@ -1,3 +1,18 @@
+### **Case Summary**
+
+**Company Overview**
+Northline Outfitters is a growing online retail company specializing in student-friendly lifestyle and tech accessories. Their product catalog includes items such as hoodies, water bottles, desk lamps, and computer peripherals. The company operates internationally, sourcing merchandise from various outside vendors and selling directly to consumers across the United States and Canada.
+
+**Data Challenges**
+As a rapidly expanding business, Northline Outfitters has reached a critical point where its current reliance on Excel spreadsheets is no longer sustainable. The existing data is "dirty" and unnormalized, presenting several significant challenges for reliable business operations:
+
+* **Inconsistent Formatting:** The records contain a mix of international date formats (e.g., DD-MM-YYYY vs. MM-DD-YYYY) and varying currency indicators (USD and CAD) embedded directly within numeric fields.
+* **Embedded Identifiers:** Critical information is often buried within text strings, such as customer loyalty status and country indicators being combined with names or addresses.
+* **Data Redundancy and Integrity:** The current files contain partial duplicates, inconsistent naming conventions for categories and vendors, and missing values in key fields like email addresses.
+* **Lack of Relational Structure:** Because the data is stored in flat files ("Sales Dump" and "Product Master"), there is no enforced relationship between employees and their managers, or products and their specific suppliers, leading to potential "update anomalies" and reporting errors.
+
+To support future growth, the company requires a transition from these messy spreadsheets to a structured relational database that enforces data integrity and allows for complex SQL-based analysis.
+
 ### **Entity Relationships**
 
 **Customers and Orders**
