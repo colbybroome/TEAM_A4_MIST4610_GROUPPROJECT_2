@@ -140,3 +140,100 @@ Now that the specific issues have been identified, the following plan outlines t
 | **Standardize Payments**| `Payments.payment_method`| `UPPER(CASE WHEN payment_method IN ('MC', 'Mastercard') THEN 'MASTERCARD' ELSE payment_method END)` |
 | **Recursive Manager Link**| `Employees.manager_id` | `UPDATE Employees e1 SET manager_id = (SELECT e2.employee_id FROM Employees e2 WHERE e1.manager_ref = e2.employee_ref)` |
 | **Normalize Category** | `Products.category_id` | `INSERT INTO Categories (category_name) SELECT DISTINCT SUBSTRING_INDEX(category, ' /', 1) FROM Staging_Table` |
+
+### **Step 5: SQL Implementation (DDL)**
+
+The following SQL script generates the relational schema for Northline Outfitters. It includes all 8 entities, defines primary and foreign keys, and implements the recursive relationship for the employee management structure.
+
+```sql
+-- 1. Categories Table
+CREATE TABLE Categories (
+    category_id INT AUTO_INCREMENT PRIMARY KEY,
+    category_name VARCHAR(50) NOT NULL
+);
+
+-- 2. Vendors Table
+CREATE TABLE Vendors (
+    vendor_id INT AUTO_INCREMENT PRIMARY KEY,
+    vendor_name VARCHAR(100) NOT NULL,
+    vendor_phone VARCHAR(20),
+    vendor_rep VARCHAR(100)
+);
+
+-- 3. Customers Table
+CREATE TABLE Customers (
+    customer_id INT AUTO_INCREMENT PRIMARY KEY,
+    customer_name VARCHAR(100),
+    customer_email VARCHAR(100),
+    loyalty_status CHAR(1) DEFAULT 'N',
+    customer_type VARCHAR(50)
+);
+
+-- 4. Employees Table (Includes Recursive Relationship)
+CREATE TABLE Employees (
+    employee_id INT AUTO_INCREMENT PRIMARY KEY,
+    employee_ref VARCHAR(10) UNIQUE NOT NULL,
+    employee_name VARCHAR(100),
+    manager_id INT,
+    CONSTRAINT fk_manager FOREIGN KEY (manager_id) 
+        REFERENCES Employees(employee_id) ON DELETE SET NULL
+);
+
+-- 5. Products Table (Includes Self-Reference for Variants)
+CREATE TABLE Products (
+    sku VARCHAR(20) PRIMARY KEY,
+    alt_sku VARCHAR(20),
+    product_description VARCHAR(255),
+    category_id INT,
+    vendor_id INT,
+    cost DECIMAL(10,2),
+    list_price DECIMAL(10,2),
+    reorder_level INT,
+    pack_size VARCHAR(50),
+    weight VARCHAR(50),
+    length VARCHAR(50),
+    discontinued CHAR(1) DEFAULT 'N',
+    parent_sku VARCHAR(20),
+    notes TEXT,
+    CONSTRAINT fk_category FOREIGN KEY (category_id) REFERENCES Categories(category_id),
+    CONSTRAINT fk_vendor FOREIGN KEY (vendor_id) REFERENCES Vendors(vendor_id),
+    CONSTRAINT fk_parent_sku FOREIGN KEY (parent_sku) REFERENCES Products(sku)
+);
+
+-- 6. Orders Table
+CREATE TABLE Orders (
+    order_id VARCHAR(20) PRIMARY KEY,
+    sale_date DATE,
+    customer_id INT,
+    employee_id INT,
+    ship_country VARCHAR(5),
+    ship_to VARCHAR(255),
+    return_flag CHAR(1) DEFAULT 'N',
+    order_notes TEXT,
+    CONSTRAINT fk_customer FOREIGN KEY (customer_id) REFERENCES Customers(customer_id),
+    CONSTRAINT fk_employee FOREIGN KEY (employee_id) REFERENCES Employees(employee_id)
+);
+
+-- 7. Order_Lines Table
+CREATE TABLE Order_Lines (
+    line_id VARCHAR(20) PRIMARY KEY,
+    order_id VARCHAR(20),
+    sku VARCHAR(20),
+    quantity INT,
+    unit_price DECIMAL(10,2),
+    discount VARCHAR(20),
+    tax VARCHAR(20),
+    line_total DECIMAL(10,2),
+    size_or_weight VARCHAR(50),
+    CONSTRAINT fk_order FOREIGN KEY (order_id) REFERENCES Orders(order_id),
+    CONSTRAINT fk_sku FOREIGN KEY (sku) REFERENCES Products(sku)
+);
+
+-- 8. Payments Table
+CREATE TABLE Payments (
+    payment_id INT AUTO_INCREMENT PRIMARY KEY,
+    order_id VARCHAR(20),
+    payment_method VARCHAR(50),
+    amount_paid DECIMAL(10,2),
+    CONSTRAINT fk_payment_order FOREIGN KEY (order_id) REFERENCES Orders(order_id)
+);
