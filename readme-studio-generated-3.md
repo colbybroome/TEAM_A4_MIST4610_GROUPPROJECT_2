@@ -110,4 +110,19 @@ The relationship between **Orders** and **Payments** is **1:M**. While most orde
 | unit_price | DECIMAL(10,2) | | Price per unit at time of sale. |
 | discount | VARCHAR(20) | | Discount applied (percentage or code). |
 | tax | VARCHAR(20) | | Tax amount or percentage applied. |
-| line_total | DECIMAL(10,2) | | Final
+| line_total | DECIMAL(10,2) | | Final total amount.
+
+### **Step 3: Data Quality Assessment**
+
+Below is a detailed assessment of the data quality issues found in the `Sales_Dump` and `Product_Supplier_Master` files. These issues prevent the data from being used in a relational database without prior cleaning and transformation.
+
+| Data Category | Specific Issues Identified | Examples from Data |
+| :--- | :--- | :--- |
+| **Date Formats** | Significant inconsistency in date recording, including U.S. styles, international styles, and written-out months. | `10-11-2025`, `Oct 17 25`, `October 5 25`, `10 Sep 2025` |
+| **Customer Info** | Attributes are concatenated into single strings using multiple types of delimiters (`;`, `\|`) and contain non-atomic data. | `Mason Rivera; Loyalty? Y`, `Grace Hall \| Student \| US` |
+| **Currency & Numeric** | Numeric fields contain string prefixes (USD/CAD) or currency symbols, which prevent mathematical calculations. | `USD 6.25`, `CAD 31.40`, `$19.43` |
+| **Case Sensitivity** | Identical categorical values are recorded with inconsistent capitalization. | `VISA` vs. `visa`, `Debit` vs. `debit` |
+| **Category Naming** | Product categories use different separators and inconsistent naming conventions for sub-categories. | `Tech / Student`, `Tech & Student`, `Audio / Student` |
+| **Missing Values** | Key contact information is missing or replaced with placeholder text in the middle of data fields. | `liam_patel@school.edu` (Missing emails for others), `Taylor Green / email missing` |
+| **Inconsistent Units** | Physical measurements (weight/length) use mixed units (imperial vs. metric) and varying abbreviations. | `8 ounces`, `499 g`, `10.2 in`, `25.4 cm` |
+| **Redundancy** | Partial duplicates exist where the same product description appears with slightly different SKU casing or pricing. | `SKU-U-1003` vs. `sku-u-1003`, `Aurora Mechanical Keyboard` (Duplicate desc) |
