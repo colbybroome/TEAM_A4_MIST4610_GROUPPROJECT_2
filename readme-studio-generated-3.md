@@ -126,3 +126,18 @@ Below is a detailed assessment of the data quality issues found in the `Sales_Du
 | **Missing Values** | Key contact information is missing or replaced with placeholder text in the middle of data fields. | `liam_patel@school.edu` (Missing emails for others), `Taylor Green / email missing` |
 | **Inconsistent Units** | Physical measurements (weight/length) use mixed units (imperial vs. metric) and varying abbreviations. | `8 ounces`, `499 g`, `10.2 in`, `25.4 cm` |
 | **Redundancy** | Partial duplicates exist where the same product description appears with slightly different SKU casing or pricing. | `SKU-U-1003` vs. `sku-u-1003`, `Aurora Mechanical Keyboard` (Duplicate desc) |
+
+### **Step 4: Data Cleaning & Transformation Plan**
+
+Now that the specific issues have been identified, the following plan outlines the logic required to transform the "dirty" source data into a clean, normalized relational format.
+
+| Objective | Target Entity/Attribute | Transformation Logic |
+| :--- | :--- | :--- |
+| **Standardize Dates** | `Orders.sale_date` | Use a parsing script to convert multiple formats (e.g., "Oct 17 25", "10-11-2025", "10 Sep 2025") into a standard ISO format (`YYYY-MM-DD`). |
+| **Atomic Customer Data** | `Customers` | Split `customer_info` using delimiters (`;` and `\|`). Extract the name into `customer_name` and parse "Loyalty? Y" into a boolean `loyalty_status` (Y=1, N=0). |
+| **Clean Financials** | `Products.cost`, `Orders.unit_price` | Use string replacement to remove non-numeric characters (e.g., "USD", "CAD", "$"). Convert the resulting strings to `DECIMAL(10,2)` for calculation. |
+| **Normalize Categories** | `Categories.category_name` | Consolidate variations like "Tech / Student" and "Tech & Student" into a single "Tech" category or maintain a hierarchy if sub-categories are required. |
+| **Recursive Links** | `Employees.manager_id` | Map the `manager_ref` string from the CSV back to the `employee_id` of the corresponding manager to establish the self-referencing relationship. |
+| **Unit Standardization** | `Products.weight`, `Products.length` | Convert all measurements to a single standard (e.g., all weights to grams, all lengths to centimeters) and strip out text labels like "ounces" or "inches". |
+| **Payment Consolidation**| `Payments.payment_method` | Use a mapping table to standardize variations (e.g., "visa", "Mastercard", "MC") into consistent values like "VISA" and "MASTERCARD". |
+| **Deduplication** | `Products` | Perform a case-insensitive check on `sku` and `product_description`. Retain the record with the most complete information and link variants to a `parent_sku`. |
