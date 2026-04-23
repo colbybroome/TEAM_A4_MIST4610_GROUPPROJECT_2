@@ -127,19 +127,16 @@ Below is a detailed assessment of the data quality issues found in the `Sales_Du
 | **Inconsistent Units** | Physical measurements (weight/length) use mixed units (imperial vs. metric) and varying abbreviations. | `8 ounces`, `499 g`, `10.2 in`, `25.4 cm` |
 | **Redundancy** | Partial duplicates exist where the same product description appears with slightly different SKU casing or pricing. | `SKU-U-1003` vs. `sku-u-1003`, `Aurora Mechanical Keyboard` (Duplicate desc) |
 
-
 ### **Step 4: Data Transformation Logic (SQL)**
 
-The following SQL logic defines how the dirty data will be transformed and standardized during the migration from flat files to the relational schema.
-
+Now that the specific issues have been identified, the following plan outlines the logic required to transform the "dirty" source data into a normalized format.
 | Objective | Target Attribute | SQL Transformation Logic / Function |
 | :--- | :--- | :--- |
+| **Currency Normalization** | `All Financials` | `CASE WHEN cost LIKE 'CAD%' THEN CAST(REGEXP_REPLACE(cost, '[^0-9.]', '') AS DECIMAL(10,2)) * 0.73 ELSE CAST(REGEXP_REPLACE(cost, '[^0-9.]', '') AS DECIMAL(10,2)) END` *(Assumes 0.73 exchange rate for CAD to USD)* |
 | **Standardize Dates** | `Orders.sale_date` | `STR_TO_DATE(sale_date, '%m-%d-%Y')` with `CASE` statements to handle variations like 'Oct 17 25' or '10 Sep 2025'. |
 | **Clean Numeric Cost** | `Products.cost` | `CAST(REPLACE(REPLACE(cost, 'USD ', ''), 'CAD ', '') AS DECIMAL(10,2))` |
-| **Clean List Price** | `Products.list_price` | `CAST(REGEXP_REPLACE(list_price, '[^0-9.]', '') AS DECIMAL(10,2))` |
 | **Atomic Customer Name** | `Customers.customer_name` | `SUBSTRING_INDEX(customer_info, ';', 1)` or `SUBSTRING_INDEX(customer_info, ' |', 1)` |
 | **Parse Loyalty Status**| `Customers.loyalty_status`| `CASE WHEN customer_info LIKE '%Loyalty? Y%' THEN 'Y' ELSE 'N' END` |
 | **Standardize Payments**| `Payments.payment_method`| `UPPER(CASE WHEN payment_method IN ('MC', 'Mastercard') THEN 'MASTERCARD' ELSE payment_method END)` |
 | **Recursive Manager Link**| `Employees.manager_id` | `UPDATE Employees e1 SET manager_id = (SELECT e2.employee_id FROM Employees e2 WHERE e1.manager_ref = e2.employee_ref)` |
 | **Normalize Category** | `Products.category_id` | `INSERT INTO Categories (category_name) SELECT DISTINCT SUBSTRING_INDEX(category, ' /', 1) FROM Staging_Table` |
-| **Handle Returns** | `Orders.return_flag` | `IFNULL(return_flag, 'N')` to ensure no null values in the boolean flag. |
