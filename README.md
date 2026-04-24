@@ -1,4 +1,3 @@
-[readme-corrected.md](https://github.com/user-attachments/files/27067099/readme-corrected.md)
 # Northline Outfitters — Database Design 
 
 ---
@@ -87,9 +86,8 @@ Below is a detailed assessment of the data quality issues found in the `Sales_Du
 
 ---
 
-### **Step 4: Data Transformation Logic (SQL)**
+### **Data Transformation**
 
-Now that the specific issues have been identified, the following plan outlines the logic required to transform the "dirty" source data into a normalized format.
 
 | Objective | Target Attribute | SQL Transformation Logic / Function |
 | :--- | :--- | :--- |
@@ -106,7 +104,7 @@ Now that the specific issues have been identified, the following plan outlines t
 
 ---
 
-### **Step 5: SQL Implementation (DDL)**
+### **SQL Implementation (DDL)**
 
 The following SQL script generates the relational schema for Northline Outfitters. It includes all 8 entities, defines primary and foreign keys, and implements the recursive relationship for the employee management structure.
 
