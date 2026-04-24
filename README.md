@@ -272,12 +272,13 @@ This query helps management identify which SKU is the top performer in each ship
 
 **2.**
 
+Which employees handled the largest number of orders, and how do their results compare with other
+employees under the same manager?
+
 Business Justifcation:
 
 This query uses a window function to calculate each employee's order count alongside the average order count for all employees sharing the same manager. This allows leadership to quickly spot high performers and underperformers within each management group.
 
-Which employees handled the largest number of orders, and how do their results compare with other
-employees under the same manager?
 
 <img width="629" height="472" alt="image" src="https://github.com/user-attachments/assets/fee40667-4e21-4eb0-9a54-a57e303fdd3c" />
 
