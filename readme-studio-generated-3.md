@@ -47,6 +47,11 @@ The relationship between **Products** and **Order_Lines** is **1:M**. A single p
 **Orders and Payments**
 The relationship between **Orders** and **Payments** is **1:M**. While most orders have a single payment, an order can technically be fulfilled through multiple payment installments or methods, though each payment record is tied to one specific order.
 
+### **Entity Breakdown**
+
+### **Entity Relationships**
+
+The database is structured around a central **Orders** hub, which captures the transaction logic by linking three primary business drivers: **Customers**, **Employees** (who facilitate sales and report to a specific **Manager** hierarchy), and **Payments**. To handle the specifics of what was purchased, the **Orders** entity connects to **OrderLines**, a bridge table that breaks down individual transaction details such as quantity, price, and discounts. These lines point directly to the **Products** entity, which serves as the master record for inventory. Each product is detailed with its own operational attributes, such as dimensions and reorder levels, and contains the products **Category**, and its possible but optional **Subcategory**. Finally, the **Vendor** entity stores the essential contact and representative information for the vendors that provide these products, ensuring the entire supply chain—from procurement to the final customer receipt—is fully integrated.
 
 ### **Data Quality Assessment**
 
