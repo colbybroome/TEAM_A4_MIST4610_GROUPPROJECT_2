@@ -263,9 +263,18 @@ After import, a final round of SQL statements was used to correct any remaining 
 
 Which products generated the highest total sales revenue, by country?
 
+Business Justifcation:
+
+This query helps management identify which SKU is the top performer in each shipping region. Using a window function to rank products within each country by total revenue, it returns only the #1 product per country — useful for regional inventory planning and targeted marketing.
+
+
 <img width="626" height="296" alt="image" src="https://github.com/user-attachments/assets/cd0c1920-4002-454c-b26e-7c3199b3686f" />
 
 **2.**
+
+Business Justifcation:
+
+This query uses a window function to calculate each employee's order count alongside the average order count for all employees sharing the same manager. This allows leadership to quickly spot high performers and underperformers within each management group.
 
 Which employees handled the largest number of orders, and how do their results compare with other
 employees under the same manager?
@@ -276,6 +285,10 @@ employees under the same manager?
 **3.**
 
 Which vendors supply products that appear in more than one category?
+
+Business Justifcation:
+
+This query identifies vendors with a diversified product portfolio. A vendor appearing in more than one category may represent a strategic multi-category supplier, which is useful for procurement decisions and vendor consolidation analysis. Including the product count and descriptions gives buyers a complete picture of each vendor's catalog breadth.
 
 <img width="627" height="364" alt="image" src="https://github.com/user-attachments/assets/37f1461e-f49b-4635-bbbe-f366e2d75a9f" />
 
