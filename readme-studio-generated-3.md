@@ -30,6 +30,9 @@ The relationship between **Vendors** and **Products** is **1:M**. One vendor can
 **Categories and Products**
 The relationship between **Categories** and **Products** is **1:M**. A single category (e.g., "Tech") can contain many different products, while each product is assigned to one primary category for organizational purposes.
 
+**Categories and Products**
+The relationship between **Categories** and **Products** is **1:M** where the cardinality is set to zero on the products side to represent that a product may not have a second category. 
+
 **Orders and Order_Lines**
 The relationship between **Orders** and **Order_Lines** is **1:M**. One order can consist of multiple line items (different products or quantities), but each specific line item belongs to only one master order.
 
