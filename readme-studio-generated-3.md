@@ -84,94 +84,94 @@ Now that the specific issues have been identified, the following plan outlines t
 
 The following SQL script generates the relational schema for Northline Outfitters. It includes all 8 entities, defines primary and foreign keys, and implements the recursive relationship for the employee management structure.
 
-```sql
+-- ==============================================
+-- DATABASE SCHEMA - CREATE STATEMENTS
+-- ==============================================
+
 -- 1. Categories Table
 CREATE TABLE Categories (
     category_id INT AUTO_INCREMENT PRIMARY KEY,
-    category_name VARCHAR(50) NOT NULL
+    category_name VARCHAR(100) NOT NULL
 );
 
 -- 2. Vendors Table
 CREATE TABLE Vendors (
     vendor_id INT AUTO_INCREMENT PRIMARY KEY,
     vendor_name VARCHAR(100) NOT NULL,
-    vendor_phone VARCHAR(20),
+    vendor_phone VARCHAR(25),
     vendor_rep VARCHAR(100)
 );
 
 -- 3. Customers Table
 CREATE TABLE Customers (
     customer_id INT AUTO_INCREMENT PRIMARY KEY,
-    customer_name VARCHAR(100),
+    first_name VARCHAR(50),
+    last_name VARCHAR(50),
     customer_email VARCHAR(100),
-    loyalty_status CHAR(1) DEFAULT 'N',
-    customer_type VARCHAR(50)
+    loyalty_status CHAR(1) DEFAULT 'N'
 );
 
--- 4. Employees Table (Includes Recursive Relationship)
+-- 4. Employees Table (Recursive Relationship)
 CREATE TABLE Employees (
-    employee_id INT AUTO_INCREMENT PRIMARY KEY,
-    employee_ref VARCHAR(10) UNIQUE NOT NULL,
-    employee_name VARCHAR(100),
-    manager_id INT,
-    CONSTRAINT fk_manager FOREIGN KEY (manager_id) 
-        REFERENCES Employees(employee_id) ON DELETE SET NULL
+    employee_ref VARCHAR(50) PRIMARY KEY,
+    manager_ref VARCHAR(50),
+    CONSTRAINT fk_manager FOREIGN KEY (manager_ref)
+        REFERENCES Employees(employee_ref) ON DELETE SET NULL
 );
 
--- 5. Products Table (Includes Self-Reference for Variants)
+-- 5. Products Table
 CREATE TABLE Products (
-    sku VARCHAR(20) PRIMARY KEY,
-    alt_sku VARCHAR(20),
+    sku VARCHAR(50) PRIMARY KEY,
+    alt_sku VARCHAR(50),
     product_description VARCHAR(255),
     category_id INT,
     vendor_id INT,
+    sub_category_id INT,
     cost DECIMAL(10,2),
     list_price DECIMAL(10,2),
-    reorder_level INT,
-    pack_size VARCHAR(50),
-    weight VARCHAR(50),
-    length VARCHAR(50),
-    discontinued CHAR(1) DEFAULT 'N',
-    parent_sku VARCHAR(20),
-    notes TEXT,
+    reorder_level VARCHAR(20),
+    discontinued VARCHAR(5),
     CONSTRAINT fk_category FOREIGN KEY (category_id) REFERENCES Categories(category_id),
-    CONSTRAINT fk_vendor FOREIGN KEY (vendor_id) REFERENCES Vendors(vendor_id),
-    CONSTRAINT fk_parent_sku FOREIGN KEY (parent_sku) REFERENCES Products(sku)
+    CONSTRAINT fk_vendor FOREIGN KEY (vendor_id) REFERENCES Vendors(vendor_id)
 );
 
 -- 6. Orders Table
 CREATE TABLE Orders (
-    order_id VARCHAR(20) PRIMARY KEY,
+    order_id VARCHAR(50) PRIMARY KEY,
     sale_date DATE,
     customer_id INT,
-    employee_id INT,
-    ship_country VARCHAR(5),
-    ship_to VARCHAR(255),
+    employee_id VARCHAR(20),
+    ship_country VARCHAR(50),
+    ship_to VARCHAR(100),
     return_flag CHAR(1) DEFAULT 'N',
-    order_notes TEXT,
-    CONSTRAINT fk_customer FOREIGN KEY (customer_id) REFERENCES Customers(customer_id),
-    CONSTRAINT fk_employee FOREIGN KEY (employee_id) REFERENCES Employees(employee_id)
+    Customers_customer_id INT,
+    Employees_employee_ref VARCHAR(50),
+    CONSTRAINT fk_customer FOREIGN KEY (Customers_customer_id)
+        REFERENCES Customers(customer_id),
+    CONSTRAINT fk_employee FOREIGN KEY (Employees_employee_ref)
+        REFERENCES Employees(employee_ref)
 );
 
 -- 7. Order_Lines Table
 CREATE TABLE Order_Lines (
-    line_id VARCHAR(20) PRIMARY KEY,
-    order_id VARCHAR(20),
-    sku VARCHAR(20),
+    line_id VARCHAR(50) PRIMARY KEY,
+    order_id VARCHAR(50),
+    sku VARCHAR(50),
     quantity INT,
     unit_price DECIMAL(10,2),
-    discount VARCHAR(20),
-    tax VARCHAR(20),
+    discount VARCHAR(50),
+    discount_type VARCHAR(20),
+    tax VARCHAR(50),
     line_total DECIMAL(10,2),
-    size_or_weight VARCHAR(50),
+    Products_sku VARCHAR(50),
     CONSTRAINT fk_order FOREIGN KEY (order_id) REFERENCES Orders(order_id),
-    CONSTRAINT fk_sku FOREIGN KEY (sku) REFERENCES Products(sku)
+    CONSTRAINT fk_sku FOREIGN KEY (Products_sku) REFERENCES Products(sku)
 );
 
 -- 8. Payments Table
 CREATE TABLE Payments (
     payment_id INT AUTO_INCREMENT PRIMARY KEY,
-    order_id VARCHAR(20),
+    order_id VARCHAR(50),
     payment_method VARCHAR(50),
     amount_paid DECIMAL(10,2),
     CONSTRAINT fk_payment_order FOREIGN KEY (order_id) REFERENCES Orders(order_id)
