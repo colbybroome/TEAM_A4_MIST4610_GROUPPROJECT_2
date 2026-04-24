@@ -1,7 +1,12 @@
 [readme-corrected.md](https://github.com/user-attachments/files/27067099/readme-corrected.md)
-# Northline Outfitters — Database Design README
+# Northline Outfitters — Database Design 
 
 ---
+**Group Info**
+
+GROUP A4
+Colby Broome-@colbybroome
+Angelis Aponte-@AngelisAponte
 
 ### **Case Summary**
 
