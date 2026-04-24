@@ -205,16 +205,19 @@ CREATE TABLE Payments (
 );
 ```
 ### **SQL Queries**
-**1** 
+**1.** 
+
 Which products generated the highest total sales revenue, by country?
 <img width="620" height="297" alt="image" src="https://github.com/user-attachments/assets/11a0571e-f3b5-4ccd-a8cb-540c3edf24ba" />
 
-**2**
+**2.**
+
 Which employees handled the largest number of orders, and how do their results compare with other
 employees under the same manager?
 <img width="624" height="470" alt="image" src="https://github.com/user-attachments/assets/47cc974a-e6d5-4e2e-9992-370b72d9601a" />
 
-**3**
+**3.**
+
 Which vendors supply products that appear in more than one category?
 <img width="1072" height="614" alt="image" src="https://github.com/user-attachments/assets/6d15536a-8d3a-4de2-a944-1693f176d366" />
 
