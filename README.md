@@ -277,16 +277,20 @@ CREATE TABLE Payments (
 **1.** 
 
 Which products generated the highest total sales revenue, by country?
-<img width="620" height="297" alt="image" src="https://github.com/user-attachments/assets/11a0571e-f3b5-4ccd-a8cb-540c3edf24ba" />
+
+<img width="626" height="296" alt="image" src="https://github.com/user-attachments/assets/cd0c1920-4002-454c-b26e-7c3199b3686f" />
 
 **2.**
 
 Which employees handled the largest number of orders, and how do their results compare with other
 employees under the same manager?
-<img width="624" height="470" alt="image" src="https://github.com/user-attachments/assets/47cc974a-e6d5-4e2e-9992-370b72d9601a" />
+
+<img width="629" height="472" alt="image" src="https://github.com/user-attachments/assets/fee40667-4e21-4eb0-9a54-a57e303fdd3c" />
+
 
 **3.**
 
 Which vendors supply products that appear in more than one category?
-<img width="1072" height="614" alt="image" src="https://github.com/user-attachments/assets/6d15536a-8d3a-4de2-a944-1693f176d366" />
+
+<img width="627" height="364" alt="image" src="https://github.com/user-attachments/assets/37f1461e-f49b-4635-bbbe-f366e2d75a9f" />
 
