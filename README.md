@@ -86,21 +86,6 @@ Below is a detailed assessment of the data quality issues found in the `Sales_Du
 
 ---
 
-### **Data Transformation**
-
-
-| Objective | Target Attribute | SQL Transformation Logic / Function |
-| :--- | :--- | :--- |
-| **Currency Normalization** | `All Financials` | `CASE WHEN cost LIKE 'CAD%' THEN CAST(REGEXP_REPLACE(cost, '[^0-9.]', '') AS DECIMAL(10,2)) * 0.73 ELSE CAST(REGEXP_REPLACE(cost, '[^0-9.]', '') AS DECIMAL(10,2)) END` *(Assumes 0.73 exchange rate for CAD to USD)* |
-| **Standardize Dates** | `Orders.sale_date` | `STR_TO_DATE(sale_date, '%m-%d-%Y')` with `CASE` statements to handle variations like `'Oct 17 25'` or `'10 Sep 2025'`. |
-| **Clean Numeric Cost** | `Products.cost` | `CAST(REPLACE(REPLACE(cost, 'USD ', ''), 'CAD ', '') AS DECIMAL(10,2))` |
-| **Parse First Name** | `Customers.first_name` | `TRIM(SUBSTRING_INDEX(SUBSTRING_INDEX(customer_info, ';', 1), ' ', 1))` |
-| **Parse Last Name** | `Customers.last_name` | `TRIM(SUBSTRING_INDEX(SUBSTRING_INDEX(customer_info, ';', 1), ' ', -1))` |
-| **Parse Loyalty Status** | `Customers.loyalty_status` | `CASE WHEN customer_info LIKE '%Loyalty? Y%' THEN 'Y' ELSE 'N' END` |
-| **Standardize Payments** | `Payments.payment_method` | `UPPER(CASE WHEN payment_method IN ('MC', 'Mastercard') THEN 'MASTERCARD' ELSE payment_method END)` |
-| **Recursive Manager Link** | `Employees.manager_ref` | `UPDATE Employees e1 SET manager_ref = (SELECT e2.employee_ref FROM Employees e2 WHERE e1.manager_ref = e2.employee_ref)` |
-| **Normalize Category** | `Products.category_id` | `INSERT INTO Categories (category_name) SELECT DISTINCT SUBSTRING_INDEX(category, ' /', 1) FROM Staging_Table` |
-| **Normalize Subcategory** | `Products.sub_category_id` | `INSERT INTO Categories (category_name) SELECT DISTINCT SUBSTRING_INDEX(category, '/ ', -1) FROM Staging_Table WHERE category LIKE '%/%'` |
 
 ---
 
@@ -139,32 +124,7 @@ Once the bulk of the cleaning was completed, the data was exported from Excel in
 7. `Order_Lines`
 8. `Payments`
 
----
-
-#### **Phase 3 — SQL Fine-Tuning**
-
-After import, a final round of SQL statements was used to correct any remaining inconsistencies that survived the pre-cleaning phase or emerged during the import process. The table below documents each specific transformation applied at this stage.
-
----
-
-### **Data Transformation**
-
-| Objective | Target Attribute | SQL Transformation Logic / Function |
-| :--- | :--- | :--- |
-| **Currency Normalization** | `All Financials` | `CASE WHEN cost LIKE 'CAD%' THEN CAST(REGEXP_REPLACE(cost, '[^0-9.]', '') AS DECIMAL(10,2)) * 0.73 ELSE CAST(REGEXP_REPLACE(cost, '[^0-9.]', '') AS DECIMAL(10,2)) END` *(Assumes 0.73 exchange rate for CAD to USD)* |
-| **Standardize Dates** | `Orders.sale_date` | `STR_TO_DATE(sale_date, '%m-%d-%Y')` with `CASE` statements to handle variations like `'Oct 17 25'` or `'10 Sep 2025'`. |
-| **Clean Numeric Cost** | `Products.cost` | `CAST(REPLACE(REPLACE(cost, 'USD ', ''), 'CAD ', '') AS DECIMAL(10,2))` |
-| **Parse First Name** | `Customers.first_name` | `TRIM(SUBSTRING_INDEX(SUBSTRING_INDEX(customer_info, ';', 1), ' ', 1))` |
-| **Parse Last Name** | `Customers.last_name` | `TRIM(SUBSTRING_INDEX(SUBSTRING_INDEX(customer_info, ';', 1), ' ', -1))` |
-| **Parse Loyalty Status** | `Customers.loyalty_status` | `CASE WHEN customer_info LIKE '%Loyalty? Y%' THEN 'Y' ELSE 'N' END` |
-| **Standardize Payments** | `Payments.payment_method` | `UPPER(CASE WHEN payment_method IN ('MC', 'Mastercard') THEN 'MASTERCARD' ELSE payment_method END)` |
-| **Recursive Manager Link** | `Employees.manager_ref` | `UPDATE Employees e1 SET manager_ref = (SELECT e2.employee_ref FROM Employees e2 WHERE e1.manager_ref = e2.employee_ref)` |
-| **Normalize Category** | `Products.category_id` | `INSERT INTO Categories (category_name) SELECT DISTINCT SUBSTRING_INDEX(category, ' /', 1) FROM Staging_Table` |
-| **Normalize Subcategory** | `Products.sub_category_id` | `INSERT INTO Categories (category_name) SELECT DISTINCT SUBSTRING_INDEX(category, '/ ', -1) FROM Staging_Table WHERE category LIKE '%/%'` |
-
----
-
-### **SQL Implementation (DDL)**
+Here are the SQL lines used to create each table:
 
 The following SQL script generates the relational schema for Northline Outfitters. It includes all 8 entities, defines primary and foreign keys, and implements the recursive relationship for the employee management structure.
 
@@ -269,6 +229,31 @@ CREATE TABLE Payments (
         REFERENCES Orders(order_id)
 );
 ```
+
+---
+
+#### **Phase 3 — SQL Fine-Tuning**
+
+After import, a final round of SQL statements was used to correct any remaining inconsistencies that survived the pre-cleaning phase or emerged during the import process. The table below documents each specific transformation applied at this stage.
+
+---
+
+### **Data Transformation**
+
+| Objective | Target Attribute | SQL Transformation Logic / Function |
+| :--- | :--- | :--- |
+| **Currency Normalization** | `All Financials` | `CASE WHEN cost LIKE 'CAD%' THEN CAST(REGEXP_REPLACE(cost, '[^0-9.]', '') AS DECIMAL(10,2)) * 0.73 ELSE CAST(REGEXP_REPLACE(cost, '[^0-9.]', '') AS DECIMAL(10,2)) END` *(Assumes 0.73 exchange rate for CAD to USD)* |
+| **Standardize Dates** | `Orders.sale_date` | `STR_TO_DATE(sale_date, '%m-%d-%Y')` with `CASE` statements to handle variations like `'Oct 17 25'` or `'10 Sep 2025'`. |
+| **Clean Numeric Cost** | `Products.cost` | `CAST(REPLACE(REPLACE(cost, 'USD ', ''), 'CAD ', '') AS DECIMAL(10,2))` |
+| **Parse First Name** | `Customers.first_name` | `TRIM(SUBSTRING_INDEX(SUBSTRING_INDEX(customer_info, ';', 1), ' ', 1))` |
+| **Parse Last Name** | `Customers.last_name` | `TRIM(SUBSTRING_INDEX(SUBSTRING_INDEX(customer_info, ';', 1), ' ', -1))` |
+| **Parse Loyalty Status** | `Customers.loyalty_status` | `CASE WHEN customer_info LIKE '%Loyalty? Y%' THEN 'Y' ELSE 'N' END` |
+| **Standardize Payments** | `Payments.payment_method` | `UPPER(CASE WHEN payment_method IN ('MC', 'Mastercard') THEN 'MASTERCARD' ELSE payment_method END)` |
+| **Recursive Manager Link** | `Employees.manager_ref` | `UPDATE Employees e1 SET manager_ref = (SELECT e2.employee_ref FROM Employees e2 WHERE e1.manager_ref = e2.employee_ref)` |
+| **Normalize Category** | `Products.category_id` | `INSERT INTO Categories (category_name) SELECT DISTINCT SUBSTRING_INDEX(category, ' /', 1) FROM Staging_Table` |
+| **Normalize Subcategory** | `Products.sub_category_id` | `INSERT INTO Categories (category_name) SELECT DISTINCT SUBSTRING_INDEX(category, '/ ', -1) FROM Staging_Table WHERE category LIKE '%/%'` |
+
+---
 
 ---
 
