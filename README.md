@@ -272,7 +272,7 @@ CREATE TABLE Payments (
 
 ---
 
-```
+
 ### **SQL Queries**
 **1.** 
 
