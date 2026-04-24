@@ -104,6 +104,66 @@ Below is a detailed assessment of the data quality issues found in the `Sales_Du
 
 ---
 
+### **Data Cleaning Process**
+
+#### **Overview**
+
+The cleaning process was completed in three phases: AI-assisted pre-cleaning, CSV export and import, and SQL fine-tuning.
+
+---
+
+#### **Phase 1 — AI-Assisted Pre-Cleaning**
+
+The raw source files (`Sales_Dump` and `Product_Supplier_Master`) contained too many inconsistencies to address manually row by row. AI tools were used to assist in bulk-identifying and resolving the most pervasive issues across both spreadsheets before any database import occurred. This included:
+
+- **Standardizing date formats** — All date values across the `sale_date` column were reviewed and reformatted into a consistent `MM-DD-YYYY` pattern, resolving variations such as `Oct 17 25`, `October 5 25`, `10 Sep 2025`, and `31/10/2025`.
+- **Splitting the `customer_info` field** — The concatenated customer strings (e.g., `Mason Rivera; Loyalty? Y`, `Grace Hall | Student | US`) were parsed to extract `first_name`, `last_name`, and `loyalty_status` into separate columns.
+- **Stripping currency prefixes** — Numeric fields containing `USD`, `CAD`, or `$` prefixes were cleaned so that only numeric values remained, allowing them to be stored as `DECIMAL` types.
+- **Normalizing case** — Payment methods (`VISA`, `visa`, `Debit`, `debit`) and SKU casing (`SKU-U-1003` vs. `sku-u-1003`) were standardized to a consistent format.
+- **Resolving category separators** — Category values using mixed delimiters (`Tech / Student`, `Tech & Student`, `Lifestyle , Student`) were normalized to a single `Category / Subcategory` format.
+- **Flagging duplicate and variant SKUs** — Rows with duplicate SKU descriptions or near-duplicate product entries (e.g., `Aurora Mechanical Keyboard` appearing under both `SKU-C-1002` and `sku-c-1002`) were identified and consolidated or flagged for removal.
+- **Handling missing values** — Fields containing placeholder text such as `Taylor Green / email missing` were cleaned; the name was preserved and the email field was left NULL rather than populated with invalid text.
+
+---
+
+#### **Phase 2 — CSV Export and Import**
+
+Once the bulk of the cleaning was completed, the data was exported from Excel into structured CSV files — one per entity — aligned to the final schema defined in the DDL. These CSVs were then imported into the corresponding MySQL tables using MySQL Workbench's table import wizard. Tables were loaded in dependency order to respect foreign key constraints:
+
+1. `Categories`
+2. `Vendors`
+3. `Customers`
+4. `Employees`
+5. `Products`
+6. `Orders`
+7. `Order_Lines`
+8. `Payments`
+
+---
+
+#### **Phase 3 — SQL Fine-Tuning**
+
+After import, a final round of SQL statements was used to correct any remaining inconsistencies that survived the pre-cleaning phase or emerged during the import process. The table below documents each specific transformation applied at this stage.
+
+---
+
+### **Data Transformation**
+
+| Objective | Target Attribute | SQL Transformation Logic / Function |
+| :--- | :--- | :--- |
+| **Currency Normalization** | `All Financials` | `CASE WHEN cost LIKE 'CAD%' THEN CAST(REGEXP_REPLACE(cost, '[^0-9.]', '') AS DECIMAL(10,2)) * 0.73 ELSE CAST(REGEXP_REPLACE(cost, '[^0-9.]', '') AS DECIMAL(10,2)) END` *(Assumes 0.73 exchange rate for CAD to USD)* |
+| **Standardize Dates** | `Orders.sale_date` | `STR_TO_DATE(sale_date, '%m-%d-%Y')` with `CASE` statements to handle variations like `'Oct 17 25'` or `'10 Sep 2025'`. |
+| **Clean Numeric Cost** | `Products.cost` | `CAST(REPLACE(REPLACE(cost, 'USD ', ''), 'CAD ', '') AS DECIMAL(10,2))` |
+| **Parse First Name** | `Customers.first_name` | `TRIM(SUBSTRING_INDEX(SUBSTRING_INDEX(customer_info, ';', 1), ' ', 1))` |
+| **Parse Last Name** | `Customers.last_name` | `TRIM(SUBSTRING_INDEX(SUBSTRING_INDEX(customer_info, ';', 1), ' ', -1))` |
+| **Parse Loyalty Status** | `Customers.loyalty_status` | `CASE WHEN customer_info LIKE '%Loyalty? Y%' THEN 'Y' ELSE 'N' END` |
+| **Standardize Payments** | `Payments.payment_method` | `UPPER(CASE WHEN payment_method IN ('MC', 'Mastercard') THEN 'MASTERCARD' ELSE payment_method END)` |
+| **Recursive Manager Link** | `Employees.manager_ref` | `UPDATE Employees e1 SET manager_ref = (SELECT e2.employee_ref FROM Employees e2 WHERE e1.manager_ref = e2.employee_ref)` |
+| **Normalize Category** | `Products.category_id` | `INSERT INTO Categories (category_name) SELECT DISTINCT SUBSTRING_INDEX(category, ' /', 1) FROM Staging_Table` |
+| **Normalize Subcategory** | `Products.sub_category_id` | `INSERT INTO Categories (category_name) SELECT DISTINCT SUBSTRING_INDEX(category, '/ ', -1) FROM Staging_Table WHERE category LIKE '%/%'` |
+
+---
+
 ### **SQL Implementation (DDL)**
 
 The following SQL script generates the relational schema for Northline Outfitters. It includes all 8 entities, defines primary and foreign keys, and implements the recursive relationship for the employee management structure.
@@ -208,6 +268,10 @@ CREATE TABLE Payments (
     CONSTRAINT fk_payment_order FOREIGN KEY (order_id)
         REFERENCES Orders(order_id)
 );
+```
+
+---
+
 ```
 ### **SQL Queries**
 **1.** 
