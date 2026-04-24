@@ -13,6 +13,11 @@ As a rapidly expanding business, Northline Outfitters has reached a critical poi
 
 To support future growth, the company requires a transition from these messy spreadsheets to a structured relational database that enforces data integrity and allows for complex SQL-based analysis.
 
+### **Conceptual Data Model**
+
+<img width="1054" height="718" alt="gp2final" src="https://github.com/user-attachments/assets/00400dae-c11a-4c5f-826e-9fdd5311e152" />
+
+
 ### **Entity Relationships**
 
 **Customers and Orders**
