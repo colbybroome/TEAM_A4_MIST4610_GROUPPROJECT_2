@@ -28,7 +28,8 @@ To support future growth, the company requires a transition from these messy spr
 
 ### **Conceptual Data Model**
 
-<img width="1054" height="718" alt="gp2final" src="https://github.com/user-attachments/assets/00400dae-c11a-4c5f-826e-9fdd5311e152" />
+<img width="1054" height="758" alt="final concept" src="https://github.com/user-attachments/assets/b4efa022-4c30-43aa-bad3-b1230edad367" />
+
 
 ---
 
