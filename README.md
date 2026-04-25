@@ -280,7 +280,7 @@ Business Justifcation:
 This query uses a window function to calculate each employee's order count alongside the average order count for all employees sharing the same manager. This allows leadership to quickly spot high performers and underperformers within each management group.
 
 
-<img width="629" height="472" alt="image" src="https://github.com/user-attachments/assets/fee40667-4e21-4eb0-9a54-a57e303fdd3c" />
+<img width="743" height="512" alt="image" src="https://github.com/user-attachments/assets/bbb635fe-efa8-49e1-ab66-1d5d3b0267d8" />
 
 
 **3.**
