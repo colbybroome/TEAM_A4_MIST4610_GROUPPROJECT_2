@@ -179,6 +179,8 @@ CREATE TABLE Products (
     list_price DECIMAL(10,2),
     reorder_level VARCHAR(20),
     discontinued VARCHAR(5),
+    weight DECIMAL(10,2)
+    length DECIMAL(10,2),
     CONSTRAINT fk_category FOREIGN KEY (category_id)
         REFERENCES Categories(category_id),
     CONSTRAINT fk_sub_category FOREIGN KEY (sub_category_id)
